@@ -1417,7 +1417,7 @@ public class Humbug extends JavaPlugin implements Listener {
   //=================================================
   // Stops perculators
   @BahHumbug(opt="max_water_lava_height", def="100", type=OptType.Int)
-  @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+  @EventHandler(priority = EventPriority.LOWEST)
   public void stopLiquidMoving(BlockFromToEvent event){
 	  Block source = event.getBlock();
 	  Block to = event.getToBlock();
