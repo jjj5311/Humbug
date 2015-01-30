@@ -1446,7 +1446,6 @@ public class Humbug extends JavaPlugin implements Listener {
 	  waterChunks.put(c, i);
 	  int amount = getWaterInNearbyChunks(c);
 	  
-	  System.out.println(" test3" + amount);
 	  if (amount > config_.get("max_water_lava_amount").getInt())
 		  event.setCancelled(true);
 	  
