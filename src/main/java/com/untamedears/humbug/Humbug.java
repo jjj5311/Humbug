@@ -100,6 +100,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -107,6 +108,8 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import com.untamedears.humbug.annotations.BahHumbug;
@@ -1416,36 +1419,68 @@ public class Humbug extends JavaPlugin implements Listener {
 
   //=================================================
   // Stops perculators
-  private Map<Location, Location> distance = new HashMap<Location, Location>();
+  private Map<Chunk, Integer> waterChunks = new HashMap<Chunk, Integer>();
+  BukkitTask waterSchedule = null;
   @BahHumbugs ({
   @BahHumbug(opt="max_water_lava_height", def="100", type=OptType.Int),
-  @BahHumbug(opt="max_water_lava_travel", def = "6", type=OptType.Int)
+  @BahHumbug(opt="max_water_lava_amount", def = "400", type=OptType.Int),
+  @BahHumbug(opt="max_water_lava_timer", def = "1200", type=OptType.Int)
   })
   @EventHandler(priority = EventPriority.LOWEST)
   public void stopLiquidMoving(BlockFromToEvent event){
-	  Block source = event.getBlock();
 	  Block to = event.getToBlock();
-	  if (source.getLocation().getBlockY() < config_.get("max_water_lava_height").getInt())
+	  Block from = event.getBlock();
+	  if (to.getLocation().getBlockY() < config_.get("max_water_lava_height").getInt())
 		  return;
-	  boolean cancel = false;
-	  Material mat = source.getType();
+	  Material mat = from.getType();
 	  if (!(mat.equals(Material.WATER) || mat.equals(Material.STATIONARY_WATER) ||
 			  mat.equals(Material.LAVA) || mat.equals(Material.STATIONARY_LAVA)))
 		  return;
-	  Location loc = distance.get(to.getLocation());
-	  if (loc == null){
-		  distance.put(to.getLocation(), source.getLocation());
-		  loc = to.getLocation();
+	  Chunk c = to.getChunk();
+	  if (!waterChunks.containsKey(c)){
+		  waterChunks.put(c, 0);
 	  }
+	  
+	  Integer i = waterChunks.get(c);
+	  i = i+1;
+	  waterChunks.put(c, i);
+	  int amount = getWaterInNearbyChunks(c);
+	  
+	  System.out.println(" test3" + amount);
+	  if (amount > config_.get("max_water_lava_amount").getInt())
+		  event.setCancelled(true);
+	  
+	  if (waterSchedule != null)
+		  return;
+	  
+	  waterSchedule = Bukkit.getScheduler().runTaskLater(this, new Runnable(){
+
+		@Override
+		public void run() {
+			waterChunks.clear();
+			waterSchedule = null;
+		}
+		  
+	  }, config_.get("max_water_lava_timer").getInt());
+  }
+  
+  public int getWaterInNearbyChunks(Chunk chunk){
+	  World world = chunk.getWorld();
+	  Chunk[] chunks = {
+			  world.getChunkAt(chunk.getX(), chunk.getZ()), world.getChunkAt(chunk.getX()-1, chunk.getZ()),
+			  world.getChunkAt(chunk.getX(), chunk.getZ()-1), world.getChunkAt(chunk.getX()-1, chunk.getZ()-1),
+			  world.getChunkAt(chunk.getX()+1, chunk.getZ()), world.getChunkAt(chunk.getX(), chunk.getZ()+1),
+			  world.getChunkAt(chunk.getX()+1, chunk.getZ()+1), world.getChunkAt(chunk.getX()-1, chunk.getZ()+1),
+			  world.getChunkAt(chunk.getX()+1, chunk.getZ()-1)
+	  };
 	  int count = 0;
-	  while((loc = distance.get(loc)) != null){
-		  count++;
-		  if (count > config_.get("max_water_lava_travel").getInt()){
-			  cancel = true;
-			  break;
-		  }
+	  for (Chunk c: chunks){
+		  Integer amount = waterChunks.get(c);
+		  if (amount == null)
+			  continue;
+		  count += amount;
 	  }
-	  event.setCancelled(cancel);
+	  return count;
   }
   // ================================================
   // Changes Strength Potions, strength_multiplier 3 is roughly Pre-1.6 Level
