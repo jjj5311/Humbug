@@ -844,34 +844,25 @@ public class Humbug extends JavaPlugin implements Listener {
     }
     LivingEntity liveMob = (LivingEntity) mob;
     for (ItemStack item : event.getDrops()) {
-    	if(liveMob.getCanPickupItems()){
-        	//mob can pick up items dont multiply the items they picked up
-        	EntityEquipment mobEquipment = liveMob.getEquipment();
-        	ItemStack[] eeItem = mobEquipment.getArmorContents();
-        	boolean armor = false;
-        	boolean hand = false;
-        	for(ItemStack i : eeItem){
-        		if(i.isSimilar(item)){
-        			armor = true;
-        			item.setAmount(1);
-        		}
-        	}
-    		if(item.isSimilar(mobEquipment.getItemInHand())){
-        		hand = true;
-        		item.setAmount(1);
-        	}
-        	if(!hand && !armor){
-        		int amount = item.getAmount() * multiplier;
-            	item.setAmount(amount);
-        	}
-        }
-    	else{
-    		int amount = item.getAmount() * multiplier;   
-    		item.setAmount(amount);
+    	EntityEquipment mobEquipment = liveMob.getEquipment();
+    	ItemStack[] eeItem = mobEquipment.getArmorContents();
+    	boolean armor = false;
+    	boolean hand = false;
+    	for(ItemStack i : eeItem){
+    		if(i.isSimilar(item)){
+    			armor = true;
+    			item.setAmount(1);
+    		}
     	}
-		
-    }  
-    
+		if(item.isSimilar(mobEquipment.getItemInHand())){
+    		hand = true;
+    		item.setAmount(1);
+    	}
+    	if(!hand && !armor){
+    		int amount = item.getAmount() * multiplier;
+        	item.setAmount(amount);
+    	}	
+    }    
   }
   
 
