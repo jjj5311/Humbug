@@ -842,10 +842,11 @@ public class Humbug extends JavaPlugin implements Listener {
     if(config_.get("disable_xp_orbs").getBool()){
     	event.setDroppedExp(0);
     }
+    //if a dropped item was in the mob's inventory, drop only one, otherwise drop the amount * the multiplier
     LivingEntity liveMob = (LivingEntity) mob;
+    EntityEquipment mobEquipment = liveMob.getEquipment();
+    ItemStack[] eeItem = mobEquipment.getArmorContents();
     for (ItemStack item : event.getDrops()) {
-    	EntityEquipment mobEquipment = liveMob.getEquipment();
-    	ItemStack[] eeItem = mobEquipment.getArmorContents();
     	boolean armor = false;
     	boolean hand = false;
     	for(ItemStack i : eeItem){
@@ -858,7 +859,7 @@ public class Humbug extends JavaPlugin implements Listener {
     		hand = true;
     		item.setAmount(1);
     	}
-    	if(!hand && !armor){
+    	if(!hand || !armor){
     		int amount = item.getAmount() * multiplier;
         	item.setAmount(amount);
     	}	
