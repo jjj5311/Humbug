@@ -824,26 +824,47 @@ public class Humbug extends JavaPlugin implements Listener {
 
   // ================================================
   // Generic mob drop rate adjustment
-
+  
+  @BahHumbug(opt="disable_xp_orbs", type=OptType.Bool, def = "true")
   public void adjustMobItemDrops(EntityDeathEvent event){
     Entity mob = event.getEntity();
     if (mob instanceof Player){
       return;
     }
-    if (mob.getWorld() == Bukkit.getWorld("world_the_end")) {
-      return;
-    }
+    
     // Try specific multiplier, if that doesn't exist use generic
     EntityType mob_type = mob.getType();
     int multiplier = config_.getLootMultiplier(mob_type.toString());
     if (multiplier == 1) {
       multiplier = config_.getLootMultiplier("generic");
     }
+    //set entity death xp to zero so they don't drop orbs
+    if(config_.get("disable_xp_orbs").getBool()){
+    	event.setDroppedExp(0);
+    }
+    LivingEntity liveMob = (LivingEntity) mob;
     for (ItemStack item : event.getDrops()) {
-      int amount = item.getAmount() * multiplier;   
-      item.setAmount(amount);
-    }  
+    	EntityEquipment mobEquipment = liveMob.getEquipment();
+    	ItemStack[] eeItem = mobEquipment.getArmorContents();
+    	boolean armor = false;
+    	boolean hand = false;
+    	for(ItemStack i : eeItem){
+    		if(i.isSimilar(item)){
+    			armor = true;
+    			item.setAmount(1);
+    		}
+    	}
+		if(item.isSimilar(mobEquipment.getItemInHand())){
+    		hand = true;
+    		item.setAmount(1);
+    	}
+    	if(!hand && !armor){
+    		int amount = item.getAmount() * multiplier;
+        	item.setAmount(amount);
+    	}	
+    }    
   }
+  
 
   @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
   public void onEntityDeathEvent(EntityDeathEvent event) {
