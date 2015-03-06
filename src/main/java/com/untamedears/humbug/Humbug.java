@@ -859,7 +859,7 @@ public class Humbug extends JavaPlugin implements Listener {
     		hand = true;
     		item.setAmount(1);
     	}
-    	if(!hand || !armor){
+    	if(!hand && !armor){
     		int amount = item.getAmount() * multiplier;
         	item.setAmount(amount);
     	}	
