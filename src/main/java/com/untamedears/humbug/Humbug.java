@@ -843,9 +843,9 @@ public class Humbug extends JavaPlugin implements Listener {
     	event.setDroppedExp(0);
     }
     LivingEntity liveMob = (LivingEntity) mob;
+    EntityEquipment mobEquipment = liveMob.getEquipment();
+    ItemStack[] eeItem = mobEquipment.getArmorContents();
     for (ItemStack item : event.getDrops()) {
-    	EntityEquipment mobEquipment = liveMob.getEquipment();
-    	ItemStack[] eeItem = mobEquipment.getArmorContents();
     	boolean armor = false;
     	boolean hand = false;
     	for(ItemStack i : eeItem){
