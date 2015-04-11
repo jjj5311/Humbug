@@ -835,7 +835,7 @@ public class Humbug extends JavaPlugin implements Listener {
     // Try specific multiplier, if that doesn't exist use generic
     EntityType mob_type = mob.getType();
     int multiplier = config_.getLootMultiplier(mob_type.toString());
-    if (multiplier == 1) {
+    if (multiplier < 0) {
       multiplier = config_.getLootMultiplier("generic");
     }
     //set entity death xp to zero so they don't drop orbs
