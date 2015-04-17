@@ -462,15 +462,14 @@ public class Humbug extends JavaPlugin implements Listener {
     }
   }
 
-  @BahHumbug(opt="enchanting_table")
+  @BahHumbug(opt="enchanting_table", def = "false")
   public void onEnchantingTableUse(PlayerInteractEvent event) {
-	  if(config_.get("enchanting_table").getBool()) {
+	  if(!config_.get("enchanting_table").getBool()) {
 		  return;
 	  }
 	  Action action = event.getAction();
 	  Material material = event.getClickedBlock().getType();
-	  boolean enchanting_table = !config_.get("enchanting_table").getBool() &&
-			  					 action == Action.RIGHT_CLICK_BLOCK &&
+	  boolean enchanting_table = action == Action.RIGHT_CLICK_BLOCK &&
 			  					 material.equals(Material.ENCHANTMENT_TABLE);
 	  if(enchanting_table) {
 		  event.setCancelled(true);
