@@ -1454,8 +1454,31 @@ public class Humbug extends JavaPlugin implements Listener {
           e.setCancelled(true);
       }
     }
+    if(!e.isCancelled() && config_.get("obsidian_generator").getBool()) {
+    	generateObsidian(e);
+    }
   }
 
+  //generates obsidian like it did in 1.7
+  //note that this does not change anything in versions where obsidian generation exists
+  @BahHumbug(opt="obsidian_generator", def=false)
+  public void generateObsidian(BlockFromToEvent event) {
+	if(!event.getBlock().getType().equals(Material.STATIONARY_LAVA)) {
+		return;
+	}
+	if(!event.getToBlock().getType().equals(Material.TRIPWIRE)) {
+		return;
+	}
+	Block string = event.getToBlock();
+	if(!(string.getRelative(BlockFace.NORTH).getType().equals(Material.STATIONARY_WATER)
+		|| string.getRelative(BlockFace.EAST).getType().equals(Material.STATIONARY_WATER)
+		|| string.getRelative(BlockFace.WEST).getType().equals(Material.STATIONARY_WATER)
+		||	string.getRelative(BlockFace.SOUTH).getType().equals(Material.STATIONARY_WATER))) {
+		return;
+	}
+	string.setType(Material.OBSIDIAN);
+  }
+	
   //=================================================
   // Stops perculators
   private Map<Chunk, Integer> waterChunks = new HashMap<Chunk, Integer>();
