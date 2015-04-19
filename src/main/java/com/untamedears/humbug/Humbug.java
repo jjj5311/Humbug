@@ -1460,7 +1460,8 @@ public class Humbug extends JavaPlugin implements Listener {
   }
 
   //generates obsidian like it did in 1.7
-  @BahHumbug(opt="obsidian_generator", def=true)
+  //note that this does not change anything in versions where obsidian generation exists
+  @BahHumbug(opt="obsidian_generator", def=false)
   public void generateObsidian(BlockFromToEvent event) {
 	if(!event.getBlock().getType().equals(Material.STATIONARY_LAVA)) {
 		return;
