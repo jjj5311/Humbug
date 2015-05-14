@@ -173,6 +173,9 @@ public class Humbug extends JavaPlugin implements Listener {
     if (!event.isCancelled()) {
       onEnchantingTableUse(event);
     }
+    if (!event.isCancelled()) {
+      onChangingSpawners(event);
+    }
   }
 
   @EventHandler(priority = EventPriority.LOWEST) // ignoreCancelled=false
@@ -2268,6 +2271,21 @@ public class Humbug extends JavaPlugin implements Listener {
     }
   }
 
+  // ================================================
+  // Disable changing spawners with eggs
+  
+  @BahHumbug(opt="changing_spawners_with_eggs", def="true")
+  public void onChangingSpawners(PlayerInteractEvent event)
+  {
+	if (!config_.get("changing_spawners_with_eggs").getBool()) {
+		return;
+	}
+    if ((event.getClickedBlock() != null) && (event.getItem() != null) && 
+      (event.getClickedBlock().getType()==Material.MOB_SPAWNER) && (event.getItem().getType() == Material.MONSTER_EGG)) {
+      event.setCancelled(true);
+    }
+  }
+  
   // ================================================
   // General
 
