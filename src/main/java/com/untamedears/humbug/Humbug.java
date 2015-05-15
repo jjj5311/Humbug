@@ -909,6 +909,18 @@ public class Humbug extends JavaPlugin implements Listener {
     Material material = item.getType();
     return material.equals(Material.GOLDEN_APPLE);
   }
+  
+  public boolean isCrackedStoneBrick(ItemStack item) {
+	// Cracked stone bricks are stone bricks with 2 durability
+	if (item == null) {
+		return false;
+	}
+	if (item.getDurability() != 2) {
+		return false;
+	}
+	Material material = item.getType();
+	return material.equals(Material.SMOOTH_BRICK);
+  }
 
   public void replaceEnchantedGoldenApple(
       String player_name, ItemStack item, int inventory_max_stack_size) {
@@ -926,20 +938,33 @@ public class Humbug extends JavaPlugin implements Listener {
     item.setAmount(stack_size);
   }
 
-  @BahHumbug(opt="ench_gold_app_craftable")
+  @BahHumbug({
+	  @BahHumbug(opt="ench_gold_app_craftable", def = "false"),
+	  @BahHumbug(opt="moss_stone_craftable", def = "false"),
+	  @BahHumbug(opt="cracked_stone_craftable", def = "false")
+  })
   public void removeRecipies() {
-    if (config_.get("ench_gold_app_craftable").getBool()) {
+    if (config_.get("ench_gold_app_craftable").getBool()&&config_.get("moss_stone_craftable").getBool()&&config_.get("cracked_stone_craftable").getBool()) {
       return;
     }
     Iterator<Recipe> it = getServer().recipeIterator();
     while (it.hasNext()) {
       Recipe recipe = it.next();
       ItemStack resulting_item = recipe.getResult();
-      if ( // !ench_gold_app_craftable_ &&
+      if (!config_.get("ench_gold_app_craftable").getBool() &&
           isEnchantedGoldenApple(resulting_item)) {
         it.remove();
         info("Enchanted Golden Apple Recipe disabled");
-      }
+      }else
+      if (!config_.get("moss_stone_craftable").getBool() &&
+              resulting_item.getType().equals(Material.MOSSY_COBBLESTONE)) {
+        it.remove();
+        info("Moss Stone Recipe disabled");
+      }else
+      if (!config_.get("cracked_stone_craftable").getBool() &&
+    		  isCrackedStoneBrick(resulting_item)) {
+    	it.remove();
+    	info("Cracked Stone Recipe disabled");
     }
   }
 
@@ -2286,6 +2311,23 @@ public class Humbug extends JavaPlugin implements Listener {
     }
   }
   
+  
+  @BahHumbug(opt="ench_gold_app_craftable")
+  public void removeRecipies() {
+    if (config_.get("ench_gold_app_craftable").getBool()) {
+      return;
+    }
+    Iterator<Recipe> it = getServer().recipeIterator();
+    while (it.hasNext()) {
+      Recipe recipe = it.next();
+      ItemStack resulting_item = recipe.getResult();
+      if ( // !ench_gold_app_craftable_ &&
+          isEnchantedGoldenApple(resulting_item)) {
+        it.remove();
+        info("Enchanted Golden Apple Recipe disabled");
+      }
+    }
+  }
   // ================================================
   // General
 
