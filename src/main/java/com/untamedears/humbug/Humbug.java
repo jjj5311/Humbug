@@ -2311,23 +2311,6 @@ public class Humbug extends JavaPlugin implements Listener {
     }
   }
   
-  
-  @BahHumbug(opt="ench_gold_app_craftable")
-  public void removeRecipies() {
-    if (config_.get("ench_gold_app_craftable").getBool()) {
-      return;
-    }
-    Iterator<Recipe> it = getServer().recipeIterator();
-    while (it.hasNext()) {
-      Recipe recipe = it.next();
-      ItemStack resulting_item = recipe.getResult();
-      if ( // !ench_gold_app_craftable_ &&
-          isEnchantedGoldenApple(resulting_item)) {
-        it.remove();
-        info("Enchanted Golden Apple Recipe disabled");
-      }
-    }
-  }
   // ================================================
   // General
 
