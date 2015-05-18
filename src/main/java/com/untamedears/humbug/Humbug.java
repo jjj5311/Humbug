@@ -845,7 +845,6 @@ public class Humbug extends JavaPlugin implements Listener {
   // ================================================
   // Generic mob drop rate adjustment
   
-  @BahHumbug(opt="disable_xp_orbs", type=OptType.Bool, def = "true")
   public void adjustMobItemDrops(EntityDeathEvent event){
     Entity mob = event.getEntity();
     if (mob instanceof Player){
@@ -857,10 +856,6 @@ public class Humbug extends JavaPlugin implements Listener {
     int multiplier = config_.getLootMultiplier(mob_type.toString());
     if (multiplier < 0) {
       multiplier = config_.getLootMultiplier("generic");
-    }
-    //set entity death xp to zero so they don't drop orbs
-    if(config_.get("disable_xp_orbs").getBool()){
-    	event.setDroppedExp(0);
     }
     //if a dropped item was in the mob's inventory, drop only one, otherwise drop the amount * the multiplier
     LivingEntity liveMob = (LivingEntity) mob;
